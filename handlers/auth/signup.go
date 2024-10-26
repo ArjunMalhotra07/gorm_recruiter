@@ -5,7 +5,6 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os/exec"
 
@@ -24,7 +23,6 @@ func Encode(b []byte) string {
 
 // ! Encrypt method is to encrypt or hide any classified text
 func Encrypt(text, secretKey string) (string, error) {
-	fmt.Println(secretKey)
 	block, err := aes.NewCipher([]byte(secretKey))
 	if err != nil {
 		return "", err

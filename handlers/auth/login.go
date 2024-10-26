@@ -49,7 +49,6 @@ func LogIn(env *models.Env, w http.ResponseWriter, r *http.Request) {
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
-
 	response := models.Response{Message: "User exists", Status: http.StatusOK, Jwt: &tokenString}
 	handlers.SendResponse(w, response, http.StatusOK)
 }
