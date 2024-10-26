@@ -27,6 +27,8 @@ func AddJob(env *models.Env, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(claims[constants.UniqueID].(string))
+	fmt.Println(claims[constants.IsEmployer].(bool))
+
 	if isEmployer, exists := claims[constants.IsEmployer].(bool); !exists || !isEmployer {
 		response := models.Response{Message: "Only employers can post jobs", Status: http.StatusUnauthorized}
 		handlers.SendResponse(w, response, http.StatusUnauthorized)

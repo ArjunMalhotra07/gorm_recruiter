@@ -22,7 +22,6 @@ func CreateToken(uuid string, IsEmployer bool) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("setting is employer bool as: ", IsEmployer)
 	return tokenString, nil
 }
 func VerifyToken(tokenString string, secret string) (*jwt.Token, error) {
