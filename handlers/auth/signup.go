@@ -45,12 +45,12 @@ func SignUp(env *models.Env, w http.ResponseWriter, r *http.Request) {
 	}
 	//! Generate UUID
 	newUUID, err := exec.Command("uuidgen").Output()
-	user.Uuid = string(newUUID)
 	if err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
+	user.Uuid = string(newUUID)
 	//! Generate encrypted password
 	encryptedPassword, err := Encrypt(user.PasswordHash, seeders.PasswordHashingSecret)
 	if err != nil {

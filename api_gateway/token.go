@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ArjunMalhotra07/gorm_recruiter/constants"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -13,14 +14,15 @@ func CreateToken(uuid string, IsEmployer bool) (string, error) {
 	var token *jwt.Token = jwt.New(jwt.SigningMethodHS256)
 	//! Set claims (payload)
 	var claims jwt.MapClaims = token.Claims.(jwt.MapClaims)
-	claims["uuid"] = uuid                                  // Example data
-	claims["exp"] = time.Now().Add(time.Hour * 700).Unix() // Token expires in 700 hours
-	claims["is_Employer"] = IsEmployer
+	claims[constants.UniqueID] = uuid                                 // Example data
+	claims[constants.Expiry] = time.Now().Add(time.Hour * 700).Unix() // Token expires in 700 hours
+	claims[constants.IsEmployer] = IsEmployer
 	//! Generate encoded token and sign it with a secret
 	tokenString, err := token.SignedString([]byte(seeders.JwtSecret))
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("setting is employer bool as: ", IsEmployer)
 	return tokenString, nil
 }
 func VerifyToken(tokenString string, secret string) (*jwt.Token, error) {
