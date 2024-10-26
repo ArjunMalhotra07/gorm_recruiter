@@ -15,6 +15,7 @@ func AppRoutes(env *models.Env) *chi.Mux {
 	router.Use(middleware.Logger)
 	router.Get("/", DefaultRoute)
 	router.Route("/", func(r chi.Router) {
+		AuthRoutes(r, env)
 	})
 	return router
 }

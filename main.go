@@ -19,6 +19,11 @@ func main() {
 		return
 	}
 	fmt.Println("Database connected successfully:", driver)
+	// Auto-migrate all models
+	if err := driver.AutoMigrate(&models.User{}, &models.Profile{}, &models.Education{}, &models.Experience{}, &models.Job{}, &models.JobApplication{}); err != nil {
+		log.Fatalf("failed to auto-migrate database: %v", err)
+		return
+	}
 	var app *models.App = application.New(driver)
 	if err := application.StartServer(app); err != nil {
 		log.Fatal(err)
