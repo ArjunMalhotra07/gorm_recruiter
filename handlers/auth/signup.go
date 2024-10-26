@@ -37,42 +37,43 @@ func Encrypt(text, secretKey string) (string, error) {
 }
 
 func SignUp(env *models.Env, w http.ResponseWriter, r *http.Request) {
+	//! Decode incoming json body
 	var user models.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		response := models.Response{Message: err.Error(), Status: 400}
-		handlers.SendResponse(w, response)
+		response := models.Response{Message: err.Error(), Status: http.StatusBadRequest}
+		handlers.SendResponse(w, response, http.StatusBadRequest)
 		return
 	}
 	//! Generate UUID
 	newUUID, err := exec.Command("uuidgen").Output()
 	user.Uuid = string(newUUID)
 	if err != nil {
-		response := models.Response{Message: err.Error(), Status: 500}
-		handlers.SendResponse(w, response)
+		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
+		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
 	//! Generate encrypted password
 	encryptedPassword, err := Encrypt(user.PasswordHash, seeders.PasswordHashingSecret)
 	if err != nil {
-		response := models.Response{Message: err.Error(), Status: 500}
-		handlers.SendResponse(w, response)
+		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
+		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
 	user.PasswordHash = encryptedPassword
 	//! Create user
 	if err := env.Create(&user).Error; err != nil {
-		response := models.Response{Message: err.Error(), Status: 500}
-		handlers.SendResponse(w, response)
+		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
+		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
 	//! Genrate token
 	tokenString, tokenError := apigateway.CreateToken(string(newUUID), user.IsAdmin)
 	if tokenError != nil {
-		response := models.Response{Message: "Failed to create token", Status: 500}
-		handlers.SendResponse(w, response)
+		response := models.Response{Message: "Failed to create token", Status: http.StatusInternalServerError}
+		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
 	response := models.Response{Message: "Created new user", Status: 200, Jwt: &tokenString}
-	handlers.SendResponse(w, response)
+	handlers.SendResponse(w, response, http.StatusOK)
 }
