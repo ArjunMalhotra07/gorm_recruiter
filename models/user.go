@@ -7,14 +7,16 @@ import (
 )
 
 type User struct {
-	Uuid            string         `gorm:"type:char(36);primaryKey" json:"uuid"`
-	Name            string         `gorm:"size:255;not null" json:"name"`
-	Email           string         `gorm:"size:255;uniqueIndex;not null" json:"email"`
-	PasswordHash    string         `gorm:"size:255;not null" json:"password_hash"`
-	IsEmployer      bool           `gorm:"default:false" json:"is_employer"`
-	ProfileHeadline string         `gorm:"size:255" json:"profile_headline"`
-	Address         string         `gorm:"type:text" json:"address"`
-	CreatedAt       time.Time      `json:"created_at"`
-	UpdatedAt       time.Time      `json:"updated_at"`
-	DeletedAt       gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	UserID          string           `gorm:"type:char(36);primaryKey" json:"user_id"`
+	Name            string           `gorm:"size:255;not null" json:"name"`
+	Email           string           `gorm:"size:255;uniqueIndex;not null" json:"email"`
+	PasswordHash    string           `gorm:"size:255;not null" json:"password_hash"`
+	IsEmployer      bool             `gorm:"default:false" json:"is_employer"`
+	ProfileHeadline string           `gorm:"size:255" json:"profile_headline"`
+	Address         string           `gorm:"type:text" json:"address"`
+	Resumes         []Resume         `gorm:"foreignKey:UserID" json:"resumes"`           // Relationship to Resumes
+	Applications    []JobApplication `gorm:"foreignKey:ApplicantID" json:"applications"` // Relationship to Job Applications
+	CreatedAt       time.Time        `json:"created_at"`
+	UpdatedAt       time.Time        `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt       gorm.DeletedAt   `gorm:"index" json:"deleted_at"`
 }

@@ -47,7 +47,7 @@ func AddJob(env *models.Env, w http.ResponseWriter, r *http.Request) {
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
-	currentJob.Uuid = string(newUUID)
+	currentJob.JobID = string(newUUID)
 	currentJob.PostedBy = claims[constants.UniqueID].(string)
 	//! Add job in table
 	if err := env.Create(&currentJob).Error; err != nil {

@@ -7,15 +7,13 @@ import (
 )
 
 type Job struct {
-	// Primary key with UUID; use the gorm:"type:char(36)" to set it as a UUID with the appropriate length
-	Uuid         string           `gorm:"type:char(36);primaryKey" json:"uuid"`
-	Title        string           `gorm:"size:255;not null" json:"title"`        // Set a size limit and make it non-null
-	Description  string           `gorm:"type:text;not null" json:"description"` // Use text type for large content
-	CompanyName  string           `gorm:"size:255;not null" json:"company_name"` // Make non-null with a length constraint
-	PostedBy     string           `gorm:"size:255;not null" json:"posted_by"`    // Record the poster’s name or ID
-	IsActive     bool             `gorm:"default:true;column:status" json:"active_status"`
-	Applications []JobApplication `gorm:"foreignKey:JobID;constraint:OnDelete:CASCADE;" json:"applications"`
-	CreatedAt    time.Time        `json:"created_at"`
-	UpdatedAt    time.Time        `gorm:"autoUpdateTime" json:"updated_at"`
-	DeletedAt    gorm.DeletedAt   `gorm:"index" json:"deleted_at"`
+	JobID       string         `gorm:"type:char(36);primaryKey" json:"job_id"`
+	Title       string         `gorm:"size:255;not null" json:"title"`
+	Description string         `gorm:"type:text;not null" json:"description"`
+	CompanyName string         `gorm:"size:255;not null" json:"company_name"`
+	IsActive    bool           `gorm:"default:true" json:"active_status"`       // Renamed for clarity
+	PostedBy    string         `gorm:"type:char(36);not null" json:"posted_by"` // Foreign key for User who posted the job
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 }

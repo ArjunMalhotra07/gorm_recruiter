@@ -50,7 +50,7 @@ func SignUp(env *models.Env, w http.ResponseWriter, r *http.Request) {
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
-	user.Uuid = string(newUUID)
+	user.UserID = string(newUUID)
 	//! Generate encrypted password
 	encryptedPassword, err := Encrypt(user.PasswordHash, seeders.PasswordHashingSecret)
 	if err != nil {
