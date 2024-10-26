@@ -43,7 +43,7 @@ func LogIn(env *models.Env, w http.ResponseWriter, r *http.Request) {
 	}
 
 	//! Generate a JWT token for the authenticated user
-	tokenString, tokenError := apigateway.CreateToken(string(currentUser.Uuid), user.IsAdmin)
+	tokenString, tokenError := apigateway.CreateToken(string(currentUser.Uuid), user.IsEmployer)
 	if tokenError != nil {
 		response := models.Response{Message: "Failed to create token", Status: http.StatusInternalServerError}
 		handlers.SendResponse(w, response, http.StatusInternalServerError)

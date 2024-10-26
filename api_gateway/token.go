@@ -8,14 +8,14 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func CreateToken(uuid string, isAdmin bool) (string, error) {
+func CreateToken(uuid string, IsEmployer bool) (string, error) {
 	//! Create a new token object
 	var token *jwt.Token = jwt.New(jwt.SigningMethodHS256)
 	//! Set claims (payload)
 	var claims jwt.MapClaims = token.Claims.(jwt.MapClaims)
 	claims["uuid"] = uuid                                  // Example data
 	claims["exp"] = time.Now().Add(time.Hour * 700).Unix() // Token expires in 700 hours
-	claims["is_admin"] = isAdmin
+	claims["is_Employer"] = IsEmployer
 	//! Generate encoded token and sign it with a secret
 	tokenString, err := token.SignedString([]byte(seeders.JwtSecret))
 	if err != nil {

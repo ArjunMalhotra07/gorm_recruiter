@@ -66,7 +66,7 @@ func SignUp(env *models.Env, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//! Genrate token
-	tokenString, tokenError := apigateway.CreateToken(string(newUUID), user.IsAdmin)
+	tokenString, tokenError := apigateway.CreateToken(string(newUUID), user.IsEmployer)
 	if tokenError != nil {
 		response := models.Response{Message: "Failed to create token", Status: http.StatusInternalServerError}
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
