@@ -3,26 +3,18 @@ package application
 import (
 	"net/http"
 
+	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"gorm.io/gorm"
 )
 
-type App struct {
-	router http.Handler
-	driver *gorm.DB
+func New(driver *gorm.DB) *models.App {
+	var d models.Env = models.Env{driver}
+	var env *models.Env = &d
+	return &models.App{Router: AppRoutes(env), Driver: driver}
 }
 
-type Env struct {
-	*gorm.DB
-}
-
-func New(driver *gorm.DB) *App {
-	var d Env = Env{driver}
-	var env *Env = &d
-	return &App{router: AppRoutes(env), driver: driver}
-}
-
-func (app *App) StartServer() error {
-	server := &http.Server{Addr: ":8080", Handler: app.router}
+func StartServer(app *models.App) error {
+	server := &http.Server{Addr: ":8080", Handler: app.Router}
 	err := http.ListenAndServe(server.Addr, server.Handler)
 	/*
 		or

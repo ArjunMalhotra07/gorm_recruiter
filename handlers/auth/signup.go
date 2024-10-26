@@ -10,7 +10,6 @@ import (
 	"os/exec"
 
 	apigateway "github.com/ArjunMalhotra07/gorm_recruiter/api_gateway"
-	"github.com/ArjunMalhotra07/gorm_recruiter/application"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
@@ -37,7 +36,7 @@ func Encrypt(text, secretKey string) (string, error) {
 	return Encode(cipherText), nil
 }
 
-func (env *application.Env) SignUp(w http.ResponseWriter, r *http.Request) {
+func SignUp(env *models.Env, w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {

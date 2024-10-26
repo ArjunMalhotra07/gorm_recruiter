@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/application"
+	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -18,8 +19,8 @@ func main() {
 		return
 	}
 	fmt.Println("Database connected successfully:", driver)
-	var app *application.App = application.New(driver)
-	if err := app.StartServer(); err != nil {
+	var app *models.App = application.New(driver)
+	if err := application.StartServer(app); err != nil {
 		log.Fatal(err)
 	}
 }
