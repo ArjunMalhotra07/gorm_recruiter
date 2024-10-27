@@ -13,13 +13,13 @@ import (
 )
 
 func AddJob(env *models.Env, w http.ResponseWriter, r *http.Request) {
+	//! Check if request is coming from employer
 	claimsInterface := r.Context().Value(constants.Claims)
 	if claimsInterface == nil {
 		response := models.Response{Message: "Unauthorized request", Status: http.StatusUnauthorized}
 		handlers.SendResponse(w, response, http.StatusUnauthorized)
 		return
 	}
-
 	claims, ok := claimsInterface.(jwt.MapClaims)
 	if !ok {
 		response := models.Response{Message: "Invalid claims format", Status: http.StatusUnauthorized}

@@ -45,4 +45,7 @@ func EmployerRoutes(router chi.Router, env *models.Env) {
 	router.Post("/postjob", func(w http.ResponseWriter, r *http.Request) {
 		employer.AddJob(env, w, r)
 	})
+	router.Get("/getall", func(w http.ResponseWriter, r *http.Request) {
+		employer.GetAllApplicants(env, w, r)
+	})
 }
