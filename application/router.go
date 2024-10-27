@@ -7,6 +7,7 @@ import (
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/auth"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/employer"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/jobs"
+	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/misc"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/ArjunMalhotra07/gorm_recruiter/mymiddleware"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
@@ -74,6 +75,9 @@ func JobRoutes(router chi.Router, env *models.Env) {
 
 func GeneralRoutes(router chi.Router, env *models.Env) {
 	router.Get("/getall", func(w http.ResponseWriter, r *http.Request) {
-		employer.GetAllApplicants(env, w, r)
+		misc.GetAllApplicants(env, w, r)
+	})
+	router.Get("/getresumes", func(w http.ResponseWriter, r *http.Request) {
+		misc.GetAllResumes(env, w, r)
 	})
 }
