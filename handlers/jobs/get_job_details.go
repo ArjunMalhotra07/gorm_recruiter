@@ -15,7 +15,7 @@ func GetJobData(env *models.Env, w http.ResponseWriter, r *http.Request) {
 	jobID := chi.URLParam(r, constants.JobID)
 	//! Fetch data from DB
 	var job models.Job
-	if err := env.DB.Where("job_id = ?", jobID).First(&job).Error; err != nil {
+	if err := env.DB.Preload("PostedBy").First(&job, "job_id = ?", jobID).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			response := models.Response{Message: "Job doesn't exist or is either deleted!", Status: http.StatusNotFound}
 			handlers.SendResponse(w, response, http.StatusNotFound)

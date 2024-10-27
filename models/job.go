@@ -11,8 +11,9 @@ type Job struct {
 	Title       string         `gorm:"size:255;not null" json:"title"`
 	Description string         `gorm:"type:text;not null" json:"description"`
 	CompanyName string         `gorm:"size:255;not null" json:"company_name"`
-	IsActive    bool           `gorm:"default:true" json:"active_status"`       // Renamed for clarity
-	PostedBy    string         `gorm:"type:char(36);not null" json:"posted_by"` // Foreign key for User who posted the job
+	IsActive    bool           `gorm:"default:true" json:"active_status"`
+	PostedByID  string         `gorm:"type:char(36);not null" json:"-"`               // Foreign key
+	PostedBy    User           `gorm:"foreignKey:PostedByID;references:UserID" json:"posted_by"` // Reference to User
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
