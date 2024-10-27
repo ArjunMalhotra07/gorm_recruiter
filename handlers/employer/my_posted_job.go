@@ -11,24 +11,19 @@ import (
 
 func GetMyJobsDetail(env *models.Env, w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(constants.Claims).(jwt.MapClaims)[constants.UniqueID].(string)
-
-	// Custom struct to hold job details with applicants
 	type JobWithApplicants struct {
 		models.Job
 		Applicants []models.User `json:"applicants"`
 	}
-
 	var jobs []models.Job
-	// Fetch jobs posted by the user that are active
+	//! Fetch jobs posted by the user that are active
 	if err := env.DB.Where("posted_by_id = ? AND is_active = ?", userID, true).Find(&jobs).Error; err != nil {
 		response := models.Response{Message: "Error fetching job details!", Status: http.StatusInternalServerError}
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
-
 	var jobsWithApplicants []JobWithApplicants
-
-	// Loop through each job and fetch the associated applicants
+	//! Loop through each job and fetch the associated applicants
 	for _, job := range jobs {
 		var applicants []models.User
 		if err := env.DB.Joins("JOIN job_applications ON job_applications.applicant_id = users.user_id").
@@ -38,15 +33,12 @@ func GetMyJobsDetail(env *models.Env, w http.ResponseWriter, r *http.Request) {
 			handlers.SendResponse(w, response, http.StatusInternalServerError)
 			return
 		}
-
-		// Append job with applicants to the response slice
+		//! Append job with applicants to the response slice
 		jobsWithApplicants = append(jobsWithApplicants, JobWithApplicants{
 			Job:        job,
 			Applicants: applicants,
 		})
 	}
-
-	// Send response with jobs and their applicants
 	response := models.Response{
 		Message: "My Jobs fetched successfully!",
 		Status:  http.StatusOK,
