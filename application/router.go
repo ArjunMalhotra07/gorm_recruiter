@@ -6,6 +6,7 @@ import (
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/auth"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/employer"
+	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/jobs"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/ArjunMalhotra07/gorm_recruiter/mymiddleware"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
@@ -24,6 +25,10 @@ func AppRoutes(env *models.Env) *chi.Mux {
 		r.Use(mymiddleware.JwtVerify(seeders.JwtSecret))
 		r.Use(mymiddleware.CheckEmployer())
 		EmployerRoutes(r, env)
+	})
+	router.Route("/job", func(r chi.Router) {
+		r.Use(mymiddleware.JwtVerify(seeders.JwtSecret))
+		JobRoutes(r, env)
 	})
 	router.Route("/misc", func(r chi.Router) {
 		r.Use(mymiddleware.JwtVerify(seeders.JwtSecret))
@@ -52,6 +57,11 @@ func EmployerRoutes(router chi.Router, env *models.Env) {
 	})
 	router.Get("/getapplicantdata", func(w http.ResponseWriter, r *http.Request) {
 		employer.GetApplicantData(env, w, r)
+	})
+}
+func JobRoutes(router chi.Router, env *models.Env) {
+	router.Get("/jobdata/{job_id}", func(w http.ResponseWriter, r *http.Request) {
+		jobs.GetJobData(env, w, r)
 	})
 }
 func GeneralRoutes(router chi.Router, env *models.Env) {
