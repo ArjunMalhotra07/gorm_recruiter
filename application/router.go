@@ -71,6 +71,9 @@ func JobRoutes(router chi.Router, env *models.Env) {
 	router.Post("/uploadresume", func(w http.ResponseWriter, r *http.Request) {
 		jobs.UploadResume(env, w, r)
 	})
+	router.Post("/apply/{job_id}", func(w http.ResponseWriter, r *http.Request) {
+		jobs.ApplyToJob(env, w, r)
+	})
 }
 
 func GeneralRoutes(router chi.Router, env *models.Env) {
