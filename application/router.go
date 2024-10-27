@@ -59,6 +59,9 @@ func EmployerRoutes(router chi.Router, env *models.Env) {
 	router.Get("/getapplicantdata", func(w http.ResponseWriter, r *http.Request) {
 		employer.GetApplicantData(env, w, r)
 	})
+	router.Get("/getmyjobsdetail", func(w http.ResponseWriter, r *http.Request) {
+		employer.GetMyJobsDetail(env, w, r)
+	})
 }
 
 func JobRoutes(router chi.Router, env *models.Env) {
