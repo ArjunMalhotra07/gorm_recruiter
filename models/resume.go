@@ -14,9 +14,9 @@ type Resume struct {
 	Name              string         `gorm:"size:255;not null" json:"name"`
 	Email             string         `gorm:"size:255;not null" json:"email"`
 	Phone             string         `gorm:"size:15" json:"phone"`
-	Skills            []string       `gorm:"type:text" json:"skills"`
-	Educations        []Education    `gorm:"foreignKey:ResumeID" json:"educations"`  // One-to-many relationship
-	Experiences       []Experience   `gorm:"foreignKey:ResumeID" json:"experiences"` // One-to-many relationship
+	Skills            string         `gorm:"type:text" json:"skills"`
+	Educations        []Education    `gorm:"foreignKey:ResumeID" json:"education"`  // One-to-many relationship
+	Experiences       []Experience   `gorm:"foreignKey:ResumeID" json:"experience"` // One-to-many relationship
 	CreatedAt         time.Time      `json:"created_at"`
 	UpdatedAt         time.Time      `json:"updated_at"`
 	DeletedAt         gorm.DeletedAt `gorm:"index" json:"deleted_at"` // Adds ID, CreatedAt, UpdatedAt, DeletedAt fields
