@@ -22,7 +22,12 @@ func AppRoutes(env *models.Env) *chi.Mux {
 	})
 	router.Route("/employer", func(r chi.Router) {
 		r.Use(mymiddleware.JwtVerify(seeders.JwtSecret))
+		r.Use(mymiddleware.CheckEmployer())
 		EmployerRoutes(r, env)
+	})
+	router.Route("/misc", func(r chi.Router) {
+		r.Use(mymiddleware.JwtVerify(seeders.JwtSecret))
+		GeneralRoutes(r, env)
 	})
 	return router
 }
@@ -45,6 +50,11 @@ func EmployerRoutes(router chi.Router, env *models.Env) {
 	router.Post("/postjob", func(w http.ResponseWriter, r *http.Request) {
 		employer.AddJob(env, w, r)
 	})
+	router.Get("/getapplicantdata", func(w http.ResponseWriter, r *http.Request) {
+		employer.GetApplicantData(env, w, r)
+	})
+}
+func GeneralRoutes(router chi.Router, env *models.Env) {
 	router.Get("/getall", func(w http.ResponseWriter, r *http.Request) {
 		employer.GetAllApplicants(env, w, r)
 	})

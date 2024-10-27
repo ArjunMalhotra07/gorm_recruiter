@@ -2,7 +2,6 @@ package employer
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os/exec"
 
@@ -13,27 +12,8 @@ import (
 )
 
 func AddJob(env *models.Env, w http.ResponseWriter, r *http.Request) {
-	//! Check if request is coming from employer
-	claimsInterface := r.Context().Value(constants.Claims)
-	if claimsInterface == nil {
-		response := models.Response{Message: "Unauthorized request", Status: http.StatusUnauthorized}
-		handlers.SendResponse(w, response, http.StatusUnauthorized)
-		return
-	}
-	claims, ok := claimsInterface.(jwt.MapClaims)
-	if !ok {
-		response := models.Response{Message: "Invalid claims format", Status: http.StatusUnauthorized}
-		handlers.SendResponse(w, response, http.StatusUnauthorized)
-		return
-	}
-	fmt.Println(claims[constants.UniqueID].(string))
-	fmt.Println(claims[constants.IsEmployer].(bool))
-
-	if isEmployer, exists := claims[constants.IsEmployer].(bool); !exists || !isEmployer {
-		response := models.Response{Message: "Only employers can post jobs", Status: http.StatusUnauthorized}
-		handlers.SendResponse(w, response, http.StatusUnauthorized)
-		return
-	}
+	//! Get user ID from jwt claims
+	userID := r.Context().Value("claims").(jwt.MapClaims)[constants.UniqueID].(string)
 	//! Decode the incoming JSON body into a Job struct
 	var currentJob models.Job
 	err := json.NewDecoder(r.Body).Decode(&currentJob)
@@ -50,7 +30,7 @@ func AddJob(env *models.Env, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	currentJob.JobID = string(newUUID)
-	currentJob.PostedBy = claims[constants.UniqueID].(string)
+	currentJob.PostedBy = userID
 	//! Add job in table
 	if err := env.Create(&currentJob).Error; err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
