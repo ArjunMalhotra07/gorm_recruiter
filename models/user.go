@@ -14,8 +14,8 @@ type User struct {
 	IsEmployer      bool             `gorm:"default:false" json:"is_employer"`
 	ProfileHeadline string           `gorm:"size:255" json:"profile_headline"`
 	Address         string           `gorm:"type:text" json:"address"`
-	Resumes         []Resume         `gorm:"foreignKey:UserID" json:"resumes"`           // Relationship to Resumes
-	Applications    []JobApplication `gorm:"foreignKey:ApplicantID" json:"applications"` // Relationship to Job Applications
+	Resumes         []Resume         `gorm:"foreignKey:UserID" json:"-"`           // Relationship to Resumes
+	Applications    []JobApplication `gorm:"foreignKey:ApplicantID" json:"-"` // Relationship to Job Applications
 	CreatedAt       time.Time        `json:"created_at"`
 	UpdatedAt       time.Time        `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt       gorm.DeletedAt   `gorm:"index" json:"deleted_at"`
