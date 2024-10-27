@@ -27,6 +27,17 @@ func ApplyToJob(env *models.Env, w http.ResponseWriter, r *http.Request) {
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
+	//! Check if user has already applied
+	var existingApplication models.JobApplication
+	if err := env.DB.Where("applicant_id = ? AND job_id = ?", userID, jobID).First(&existingApplication).Error; err == nil {
+		response := models.Response{Message: "You have already applied for this job!", Status: http.StatusConflict}
+		handlers.SendResponse(w, response, http.StatusConflict)
+		return
+	} else if err != gorm.ErrRecordNotFound {
+		response := models.Response{Message: "Error checking application status", Status: http.StatusInternalServerError}
+		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		return
+	}
 	//! Generate Application ID
 	applicationID, err := exec.Command("uuidgen").Output()
 	if err != nil {
