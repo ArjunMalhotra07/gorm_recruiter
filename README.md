@@ -10,4 +10,5 @@ GetApplicantData, GetAllApplicants, GetAllResumes: Fetch applicant profiles and 
 GetMyJobsDetail, AddJob, GetAllJobs, GetJobData: Manage job postings and retrieve job information.
 ApplyToJob: Allow applicants to submit job applications.
 
-All the schema relationships are depicted down below: <img width="633" alt="Screenshot 2024-10-21 at 8 23 19 AM" src="https://github.com/user-attachments/assets/3359d928-706d-4c9f-b2d2-ed8b7e804d9a">
+All the schema relationships are depicted down below: 
+<img width="859" alt="schemas" src="https://github.com/user-attachments/assets/80d21afe-3a12-4013-9b4b-94ea667b5881">
