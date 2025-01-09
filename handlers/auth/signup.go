@@ -6,9 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
-	"os/exec"
 
-	apigateway "github.com/ArjunMalhotra07/gorm_recruiter/api_gateway"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
@@ -34,7 +32,7 @@ func Encrypt(text, secretKey string) (string, error) {
 	return Encode(cipherText), nil
 }
 
-func SignUp(env *models.Env, w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	//! Decode incoming json body
 	var user models.User
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -44,7 +42,7 @@ func SignUp(env *models.Env, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//! Generate UUID
-	newUUID, err := exec.Command("uuidgen").Output()
+	newUUID, err := h.repo.CreateUserID()
 	if err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
@@ -52,7 +50,7 @@ func SignUp(env *models.Env, w http.ResponseWriter, r *http.Request) {
 	}
 	user.UserID = string(newUUID)
 	//! Generate encrypted password
-	encryptedPassword, err := Encrypt(user.PasswordHash, seeders.PasswordHashingSecret)
+	encryptedPassword, err := h.repo.CreateEncryptedPassword(user.PasswordHash, seeders.PasswordHashingSecret)
 	if err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
@@ -60,13 +58,13 @@ func SignUp(env *models.Env, w http.ResponseWriter, r *http.Request) {
 	}
 	user.PasswordHash = encryptedPassword
 	//! Create user
-	if err := env.Create(&user).Error; err != nil {
+	if err := h.repo.CreateUser(&user); err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
 	//! Genrate token
-	tokenString, tokenError := apigateway.CreateToken(string(newUUID), user.IsEmployer)
+	tokenString, tokenError := h.repo.CreateJwtToken(string(newUUID), user.IsEmployer)
 	if tokenError != nil {
 		response := models.Response{Message: "Failed to create token", Status: http.StatusInternalServerError}
 		handlers.SendResponse(w, response, http.StatusInternalServerError)

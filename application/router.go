@@ -1,26 +1,28 @@
 package application
 
 import (
+	"encoding/json"
 	"net/http"
 
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/auth"
+	handlers "github.com/ArjunMalhotra07/gorm_recruiter/handlers/auth"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/employer"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/jobs"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/misc"
 	"github.com/ArjunMalhotra07/gorm_recruiter/middlewares"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
+	repo "github.com/ArjunMalhotra07/gorm_recruiter/repo/auth"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"gorm.io/gorm"
 )
 
-func AppRoutes(env *models.Env) *chi.Mux {
+func AppRoutes(env *models.Env, driver *gorm.DB) *chi.Mux {
 	var router *chi.Mux = chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Get("/", DefaultRoute)
 	router.Route("/", func(r chi.Router) {
-		AuthRoutes(r, env)
+		AuthRoutes(r, driver)
 	})
 	router.Route("/employer", func(r chi.Router) {
 		r.Use(middlewares.JwtVerify(seeders.JwtSecret))
@@ -40,16 +42,16 @@ func AppRoutes(env *models.Env) *chi.Mux {
 
 func DefaultRoute(w http.ResponseWriter, r *http.Request) {
 	message := models.Response{Message: "Hey!", Status: 200}
-	handlers.SendResponse(w, message, http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(message)
 }
 
-func AuthRoutes(router chi.Router, env *models.Env) {
-	router.Post("/signup", func(w http.ResponseWriter, r *http.Request) {
-		auth.SignUp(env, w, r)
-	})
-	router.Post("/login", func(w http.ResponseWriter, r *http.Request) {
-		auth.LogIn(env, w, r)
-	})
+func AuthRoutes(router chi.Router, driver *gorm.DB) {
+	authRepo := repo.NewAuthRepo(driver)
+	authHandler := handlers.NewAuthHandler(authRepo)
+	router.Post("/signup", authHandler.SignUp)
+	router.Post("/login", authHandler.LogIn)
 }
 
 func EmployerRoutes(router chi.Router, env *models.Env) {

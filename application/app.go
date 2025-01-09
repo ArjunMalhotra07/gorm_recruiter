@@ -10,7 +10,7 @@ import (
 func New(driver *gorm.DB) *models.App {
 	var d models.Env = models.Env{driver}
 	var env *models.Env = &d
-	return &models.App{Router: AppRoutes(env), Driver: driver}
+	return &models.App{Router: AppRoutes(env, driver), Driver: driver}
 }
 
 func StartServer(app *models.App) error {
