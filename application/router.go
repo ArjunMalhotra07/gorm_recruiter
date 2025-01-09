@@ -8,8 +8,8 @@ import (
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/employer"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/jobs"
 	"github.com/ArjunMalhotra07/gorm_recruiter/handlers/misc"
+	"github.com/ArjunMalhotra07/gorm_recruiter/middlewares"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
-	"github.com/ArjunMalhotra07/gorm_recruiter/mymiddleware"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -23,16 +23,16 @@ func AppRoutes(env *models.Env) *chi.Mux {
 		AuthRoutes(r, env)
 	})
 	router.Route("/employer", func(r chi.Router) {
-		r.Use(mymiddleware.JwtVerify(seeders.JwtSecret))
-		r.Use(mymiddleware.CheckEmployer())
+		r.Use(middlewares.JwtVerify(seeders.JwtSecret))
+		r.Use(middlewares.CheckEmployer())
 		EmployerRoutes(r, env)
 	})
 	router.Route("/jobs", func(r chi.Router) {
-		r.Use(mymiddleware.JwtVerify(seeders.JwtSecret))
+		r.Use(middlewares.JwtVerify(seeders.JwtSecret))
 		JobRoutes(r, env)
 	})
 	router.Route("/misc", func(r chi.Router) {
-		r.Use(mymiddleware.JwtVerify(seeders.JwtSecret))
+		r.Use(middlewares.JwtVerify(seeders.JwtSecret))
 		GeneralRoutes(r, env)
 	})
 	return router
