@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"net/mail"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
@@ -14,6 +15,19 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusBadRequest}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	//! Validate email
+	if user.Email == "" {
+		response := models.Response{Message: "Email is required", Status: http.StatusBadRequest}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	//! Check if email is valid
+	if _, err := mail.ParseAddress(user.Email); err != nil {
+		response := models.Response{Message: "Invalid email format", Status: http.StatusBadRequest}
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
