@@ -1,51 +1,27 @@
 package handlers
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"encoding/base64"
-	"encoding/json"
 	"net/http"
 
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
+	"github.com/gin-gonic/gin"
 )
 
-var bytes = []byte{35, 46, 57, 24, 85, 35, 24, 74, 87, 35, 88, 98, 66, 32, 14, 05}
-
-// ! This should be in an env file in production
-func Encode(b []byte) string {
-	return base64.StdEncoding.EncodeToString(b)
-}
-
-// ! Encrypt method is to encrypt or hide any classified text
-func Encrypt(text, secretKey string) (string, error) {
-	block, err := aes.NewCipher([]byte(secretKey))
-	if err != nil {
-		return "", err
-	}
-	plainText := []byte(text)
-	cfb := cipher.NewCFBEncrypter(block, bytes)
-	cipherText := make([]byte, len(plainText))
-	cfb.XORKeyStream(cipherText, plainText)
-	return Encode(cipherText), nil
-}
-
-func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) SignUp(c *gin.Context) {
 	//! Decode incoming json body
 	var user models.User
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
+
+	if err := c.ShouldBindJSON(&user); err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusBadRequest}
-		handlers.SendResponse(w, response, http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 	//! Generate UUID
 	newUUID, err := h.repo.CreateUserID()
 	if err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	user.UserID = string(newUUID)
@@ -53,23 +29,24 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	encryptedPassword, err := h.repo.CreateEncryptedPassword(user.PasswordHash, seeders.PasswordHashingSecret)
 	if err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	user.PasswordHash = encryptedPassword
 	//! Create user
 	if err := h.repo.CreateUser(&user); err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	//! Genrate token
 	tokenString, tokenError := h.repo.CreateJwtToken(string(newUUID), user.IsEmployer)
 	if tokenError != nil {
 		response := models.Response{Message: "Failed to create token", Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	response := models.Response{Message: "Created new user", Status: 200, Jwt: &tokenString}
-	handlers.SendResponse(w, response, http.StatusOK)
+	c.JSON(http.StatusOK, response)
+
 }
