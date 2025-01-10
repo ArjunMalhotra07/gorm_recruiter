@@ -12,7 +12,7 @@ import (
 
 func AppRoutes(env *models.Env, driver *gorm.DB) *gin.Engine {
 	router := gin.Default()
-	// router.Use(middleware.Logger)
+	// router.Use(middlewares.Logger)
 	router.GET("/", DefaultRoute)
 	var authAPIs *gin.RouterGroup = router.Group("/")
 	{

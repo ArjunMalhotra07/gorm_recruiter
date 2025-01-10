@@ -3,29 +3,29 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func GetApplicantData(env *models.Env, w http.ResponseWriter, r *http.Request) {
+func (h *EmployerHandler) GetApplicantData(c *gin.Context) {
 	//! Get Applicant ID
-	applicantID := r.URL.Query().Get("applicant_id")
+	applicantID := c.GetString("applicant_id")
 	if applicantID == "" {
 		response := models.Response{Message: "Applicant ID is required", Status: http.StatusBadRequest}
-		handlers.SendResponse(w, response, http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 	//! Fetch data from DB
-	var applicant models.User
-	if err := env.DB.Where("user_id = ?", applicantID).First(&applicant).Error; err != nil {
+	applicant, err := h.repo.FetchApplicantByID(applicantID)
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			response := models.Response{Message: "Record Not found", Status: http.StatusNotFound}
-			handlers.SendResponse(w, response, http.StatusNotFound)
+			c.JSON(http.StatusNotFound, response)
 			return
 		}
 		response := models.Response{Message: "Error fetching applicant", Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	response := models.Response{
@@ -33,5 +33,5 @@ func GetApplicantData(env *models.Env, w http.ResponseWriter, r *http.Request) {
 		Status:  http.StatusOK,
 		Data:    applicant,
 	}
-	handlers.SendResponse(w, response, http.StatusOK)
+	c.JSON(http.StatusOK, response)
 }
