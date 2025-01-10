@@ -16,6 +16,7 @@ func EmployerRoutes(router *gin.RouterGroup, driver *gorm.DB) {
 	router.Use(middlewares.CheckEmployer())
 	router.GET("/getmyjobs", employerHandler.GetMyJobsDetail)
 	router.GET("/getapplicantdata", employerHandler.GetApplicantData)
+	router.POST("/postjob", employerHandler.AddJob)
 }
 
 /*

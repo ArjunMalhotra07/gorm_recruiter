@@ -1,42 +1,42 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 	"os/exec"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/constants"
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
-func AddJob(env *models.Env, w http.ResponseWriter, r *http.Request) {
+func (h *EmployerHandler) AddJob(c *gin.Context) {
 	//! Get user ID from jwt claims
-	userID := r.Context().Value("claims").(jwt.MapClaims)[constants.UniqueID].(string)
+	claimsInterface, _ := c.Get(constants.Claims)
+	claims, _ := claimsInterface.(jwt.MapClaims)
+	userID, _ := claims[constants.UniqueID].(string)
 	//! Decode the incoming JSON body into a Job struct
 	var currentJob models.Job
-	err := json.NewDecoder(r.Body).Decode(&currentJob)
-	if err != nil {
+	if err := c.ShouldBindJSON(&currentJob); err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	//! Generating new id for job
 	newUUID, err := exec.Command("uuidgen").Output()
 	if err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	currentJob.JobID = string(newUUID)
 	currentJob.PostedByID = userID
 	//! Add job in table
-	if err := env.Create(&currentJob).Error; err != nil {
+	if err := h.repo.AddJob(&currentJob); err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	response := models.Response{Message: "Job Posted successfully!", Status: 200}
-	handlers.SendResponse(w, response, http.StatusOK)
+	c.JSON(http.StatusOK, response)
 }

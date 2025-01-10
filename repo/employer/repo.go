@@ -9,6 +9,7 @@ type EmployerRepository interface {
 	GetJobsPostedByUser(userID string, isActive bool) ([]models.Job, error)
 	GetApplicantsForJob(jobID string) ([]models.User, error)
 	GetApplicantData(userID string) (*models.User, error)
+	AddJob(job *models.Job) error
 }
 
 type EmployerRepo struct {

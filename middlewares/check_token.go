@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	apigateway "github.com/ArjunMalhotra07/gorm_recruiter/api_gateway"
-	"github.com/ArjunMalhotra07/gorm_recruiter/constants"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -31,8 +30,8 @@ func JwtVerify(secret string) gin.HandlerFunc {
 			return
 		}
 		claims, ok := token.Claims.(jwt.MapClaims)
-		fmt.Println(claims[constants.IsEmployer])
-		fmt.Println(claims[constants.UniqueID])
+		// fmt.Println(claims[constants.IsEmployer])
+		// fmt.Println(claims[constants.UniqueID])
 		if !ok {
 			response := models.Response{Message: "Invalid Token Claims", Status: http.StatusUnauthorized, Data: ""}
 			c.JSON(http.StatusUnauthorized, response)
