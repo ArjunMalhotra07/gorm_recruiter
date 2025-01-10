@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"net/mail"
 
@@ -61,5 +63,9 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 	}
 	response := models.Response{Message: "Created new user", Status: 200, Jwt: &tokenString}
 	c.JSON(http.StatusOK, response)
-
+	body := fmt.Sprintf("Hey %s, You have successfully signed up! Your profile headline `%s` is super catchy. We hope to provide you better services at %s", user.Name, user.ProfileHeadline, user.Address)
+	emailErr := h.repo.SendWelcomeEmail(user.Email, "Welcome to Our Platform!", body)
+	if emailErr != nil {
+		log.Printf("Failed to send email: %v", emailErr)
+	}
 }
