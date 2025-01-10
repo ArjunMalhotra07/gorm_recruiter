@@ -1,48 +1,47 @@
-package employer
+package handlers
 
 import (
 	"net/http"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/constants"
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
-func GetMyJobsDetail(env *models.Env, w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value(constants.Claims).(jwt.MapClaims)[constants.UniqueID].(string)
-	type JobWithApplicants struct {
+func (h *EmployerHandler) GetMyJobsDetail(c *gin.Context) {
+	userID := c.GetString(constants.UniqueID)
+	//! Fetch jobs posted by the user
+	jobs, err := h.repo.GetJobsPostedByUser(userID, true)
+	if err != nil {
+		response := models.Response{Message: "Error fetching job details!", Status: http.StatusInternalServerError}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	//! Fetch applicants for each job
+	var jobsWithApplicants []struct {
 		models.Job
 		Applicants []models.User `json:"applicants"`
 	}
-	var jobs []models.Job
-	//! Fetch jobs posted by the user that are active
-	if err := env.DB.Where("posted_by_id = ? AND is_active = ?", userID, true).Find(&jobs).Error; err != nil {
-		response := models.Response{Message: "Error fetching job details!", Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
-		return
-	}
-	var jobsWithApplicants []JobWithApplicants
-	//! Loop through each job and fetch the associated applicants
 	for _, job := range jobs {
-		var applicants []models.User
-		if err := env.DB.Joins("JOIN job_applications ON job_applications.applicant_id = users.user_id").
-			Where("job_applications.job_id = ?", job.JobID).
-			Find(&applicants).Error; err != nil {
+		applicants, err := h.repo.GetApplicantsForJob(job.JobID)
+		if err != nil {
 			response := models.Response{Message: "Error fetching applicants!", Status: http.StatusInternalServerError}
-			handlers.SendResponse(w, response, http.StatusInternalServerError)
+			c.JSON(http.StatusInternalServerError, response)
 			return
 		}
-		//! Append job with applicants to the response slice
-		jobsWithApplicants = append(jobsWithApplicants, JobWithApplicants{
+		jobsWithApplicants = append(jobsWithApplicants, struct {
+			models.Job
+			Applicants []models.User `json:"applicants"`
+		}{
 			Job:        job,
 			Applicants: applicants,
 		})
 	}
+	//! Send response
 	response := models.Response{
 		Message: "My Jobs fetched successfully!",
 		Status:  http.StatusOK,
 		Data:    jobsWithApplicants,
 	}
-	handlers.SendResponse(w, response, http.StatusOK)
+	c.JSON(http.StatusOK, response)
 }
