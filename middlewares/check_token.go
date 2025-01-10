@@ -1,40 +1,37 @@
 package middlewares
 
 import (
-	"context"
 	"net/http"
 	"strings"
 
 	apigateway "github.com/ArjunMalhotra07/gorm_recruiter/api_gateway"
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
-func JwtVerify(secret string) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			authorizationHeader := r.Header.Get("Authorization")
-			if authorizationHeader == "" {
-				response := models.Response{Message: "Missing Authorization header", Status: http.StatusUnauthorized, Data: ""}
-				handlers.SendResponse(w, response, http.StatusUnauthorized)
-				return
-			}
-			tokenString := strings.TrimSpace(strings.Replace(authorizationHeader, "Bearer", "", 1))
-			token, err := apigateway.VerifyToken(tokenString, secret)
-			if err != nil {
-				response := models.Response{Message: "Invalid Token", Status: http.StatusUnauthorized, Data: ""}
-				handlers.SendResponse(w, response, http.StatusUnauthorized)
-				return
-			}
-			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-				r = r.WithContext(context.WithValue(r.Context(), "claims", claims))
-				next.ServeHTTP(w, r)
-			} else {
-				response := models.Response{Message: "Invalid Token", Status: http.StatusUnauthorized, Data: ""}
-				handlers.SendResponse(w, response, http.StatusUnauthorized)
-				return
-			}
-		})
+func JwtVerify(secret string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authorizationHeader := c.GetHeader("Authorization")
+		if authorizationHeader == "" {
+			response := models.Response{Message: "Missing Authorization header", Status: http.StatusUnauthorized, Data: ""}
+			c.JSON(http.StatusUnauthorized, response)
+			return
+		}
+		tokenString := strings.TrimSpace(strings.Replace(authorizationHeader, "Bearer", "", 1))
+		token, err := apigateway.VerifyToken(tokenString, secret)
+		if err != nil {
+			response := models.Response{Message: "Invalid Token", Status: http.StatusUnauthorized, Data: ""}
+			c.JSON(http.StatusUnauthorized, response)
+			return
+		}
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			c.Set("claims", claims)
+			c.Next()
+		} else {
+			response := models.Response{Message: "Invalid Token", Status: http.StatusUnauthorized, Data: ""}
+			c.JSON(http.StatusUnauthorized, response)
+			return
+		}
 	}
 }
