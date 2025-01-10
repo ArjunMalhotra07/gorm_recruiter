@@ -18,11 +18,3 @@ func EmployerRoutes(router *gin.RouterGroup, driver *gorm.DB) {
 	router.GET("/getapplicantdata", employerHandler.GetApplicantData)
 	router.POST("/postjob", employerHandler.AddJob)
 }
-
-/*
- func EmployerRoutes(router chi.Router, env *models.Env) {
- 	router.Post("/postjob", func(w http.ResponseWriter, r *http.Request) {
- 		employer.AddJob(env, w, r)
- 	})
- }
-*/
