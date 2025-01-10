@@ -3,9 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"github.com/ArjunMalhotra07/gorm_recruiter/middlewares"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
-	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -20,8 +18,6 @@ func AppRoutes(env *models.Env, driver *gorm.DB) *gin.Engine {
 	}
 	var employerAPIs *gin.RouterGroup = router.Group("/employer")
 	{
-		router.Use(middlewares.JwtVerify(seeders.JwtSecret))
-		router.Use(middlewares.CheckEmployer())
 		EmployerRoutes(employerAPIs, driver)
 	}
 	// router.Route("/jobs", func(r chi.Router) {

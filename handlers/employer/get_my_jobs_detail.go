@@ -5,11 +5,15 @@ import (
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/constants"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
 func (h *EmployerHandler) GetMyJobsDetail(c *gin.Context) {
-	userID := c.GetString(constants.UniqueID)
+	claimsInterface, _ := c.Get(constants.Claims)
+	claims, _ := claimsInterface.(jwt.MapClaims)
+	userID, _ := claims[constants.UniqueID].(string)
+
 	//! Fetch jobs posted by the user
 	jobs, err := h.repo.GetJobsPostedByUser(userID, true)
 	if err != nil {

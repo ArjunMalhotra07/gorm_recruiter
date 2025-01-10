@@ -10,7 +10,7 @@ import (
 
 func (h *EmployerHandler) GetApplicantData(c *gin.Context) {
 	//! Get Applicant ID
-	applicantID := c.GetString("applicant_id")
+	applicantID := c.Query("applicant_id")
 	if applicantID == "" {
 		response := models.Response{Message: "Applicant ID is required", Status: http.StatusBadRequest}
 		c.JSON(http.StatusBadRequest, response)

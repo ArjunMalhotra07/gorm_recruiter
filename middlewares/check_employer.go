@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/constants"
@@ -13,31 +12,28 @@ import (
 func CheckEmployer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		claimsInterface, exists := c.Get(constants.Claims)
-		if !exists {
+		if !exists || claimsInterface == nil {
 			response := models.Response{Message: "Unauthorized request", Status: http.StatusUnauthorized}
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
-			return
-		}
-		if claimsInterface == nil {
-			response := models.Response{Message: "Unauthorized request", Status: http.StatusUnauthorized}
-			c.JSON(http.StatusUnauthorized, response)
 			return
 		}
 		claims, ok := claimsInterface.(jwt.MapClaims)
 		if !ok {
 			response := models.Response{Message: "Invalid claims format", Status: http.StatusUnauthorized}
 			c.JSON(http.StatusUnauthorized, response)
+			c.Abort()
 			return
 		}
-		if isEmployer, exists := claims[constants.IsEmployer].(bool); !exists || !isEmployer {
+		isEmployer, ok := claims[constants.IsEmployer].(bool)
+		// fmt.Println(isEmployer)
+		// fmt.Println("Checking if the user is an employer")
+		if !ok || !isEmployer {
 			response := models.Response{Message: "Not an employer!", Status: http.StatusUnauthorized}
 			c.JSON(http.StatusUnauthorized, response)
+			c.Abort()
 			return
-		} else {
-			fmt.Println(claims[constants.IsEmployer].(bool))
-			c.Set("claims", claims)
-			c.Next()
 		}
+		c.Next()
 	}
 }

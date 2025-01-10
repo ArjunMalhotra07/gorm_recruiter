@@ -12,7 +12,6 @@ import (
 func (h *AuthHandler) SignUp(c *gin.Context) {
 	//! Decode incoming json body
 	var user models.User
-
 	if err := c.ShouldBindJSON(&user); err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusBadRequest}
 		c.JSON(http.StatusBadRequest, response)
