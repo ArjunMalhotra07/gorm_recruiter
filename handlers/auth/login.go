@@ -6,7 +6,6 @@ import (
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func (h *AuthHandler) LogIn(c *gin.Context) {
@@ -26,13 +25,8 @@ func (h *AuthHandler) LogIn(c *gin.Context) {
 	}
 
 	//! Check if the user exists in the database with the provided email and password
-	var currentUser models.User
-	if err := h.repo.LoginUser(user.Email, encText); err != nil {
-		if err == gorm.ErrRecordNotFound {
-			response := models.Response{Message: "Email ID or Password doesn't match", Status: http.StatusUnauthorized}
-			c.JSON(http.StatusUnauthorized, response)
-			return
-		}
+	currentUser, err := h.repo.LoginUser(user.Email, encText)
+	if err != nil {
 		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
 		c.JSON(http.StatusInternalServerError, response)
 		return
@@ -47,5 +41,4 @@ func (h *AuthHandler) LogIn(c *gin.Context) {
 	}
 	response := models.Response{Message: "User exists", Status: http.StatusOK, Jwt: &tokenString}
 	c.JSON(http.StatusOK, response)
-
 }

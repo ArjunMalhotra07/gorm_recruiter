@@ -10,7 +10,7 @@ type Authentication interface {
 	CreateEncryptedPassword(userPassword, passwordHash string) (string, error)
 	CreateUser(user *models.User) error
 	CreateJwtToken(userID string, isEmployer bool) (string, error)
-	LoginUser(email, password string) error
+	LoginUser(email, password string) (*models.User, error)
 }
 
 type AuthRepo struct {
