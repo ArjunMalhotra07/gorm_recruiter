@@ -1,23 +1,23 @@
-package misc
+package handlers
 
 import (
 	"net/http"
 
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
+	"github.com/gin-gonic/gin"
 )
 
-func GetAllResumes(env *models.Env, w http.ResponseWriter, r *http.Request) {
+func (h *MiscHandler) GetAllResumes(c *gin.Context) {
 	//! Fetch data from DB
-	var resumes []models.Resume
-	if err := env.DB.Preload("Educations").Preload("Experiences").Find(&resumes).Error; err != nil {
+	resumes, err := h.repo.GetAllResumes()
+	if err != nil {
 		response := models.Response{Message: "Error fetching resumes"}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	response := models.Response{
-		Message: "resumes fetched successfully!",
+		Message: "Resumes fetched successfully!",
 		Data:    resumes,
 	}
-	handlers.SendResponse(w, response, http.StatusOK)
+	c.JSON(http.StatusOK, response)
 }
