@@ -12,7 +12,7 @@ func (h *EmployerHandler) GetApplicantData(c *gin.Context) {
 	//! Get Applicant ID
 	applicantID := c.Query("applicant_id")
 	if applicantID == "" {
-		response := models.Response{Message: "Applicant ID is required", Status: http.StatusBadRequest}
+		response := models.Response{Message: "Applicant ID is required"}
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -20,17 +20,16 @@ func (h *EmployerHandler) GetApplicantData(c *gin.Context) {
 	applicant, err := h.repo.FetchApplicantByID(applicantID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			response := models.Response{Message: "Record Not found", Status: http.StatusNotFound}
+			response := models.Response{Message: "Record Not found"}
 			c.JSON(http.StatusNotFound, response)
 			return
 		}
-		response := models.Response{Message: "Error fetching applicant", Status: http.StatusInternalServerError}
+		response := models.Response{Message: "Error fetching applicant"}
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	response := models.Response{
 		Message: "Applicant fetched successfully!",
-		Status:  http.StatusOK,
 		Data:    applicant,
 	}
 	c.JSON(http.StatusOK, response)

@@ -15,7 +15,7 @@ func JwtVerify(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			response := models.Response{Message: "Missing Authorization header", Status: http.StatusUnauthorized, Data: ""}
+			response := models.Response{Message: "Missing Authorization header", Data: ""}
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
 			return
@@ -24,7 +24,7 @@ func JwtVerify(secret string) gin.HandlerFunc {
 		fmt.Println(tokenString)
 		token, err := apigateway.VerifyToken(tokenString, secret)
 		if err != nil || !token.Valid {
-			response := models.Response{Message: "Invalid or expired Token", Status: http.StatusUnauthorized, Data: ""}
+			response := models.Response{Message: "Invalid or expired Token", Data: ""}
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
 			return
@@ -33,7 +33,7 @@ func JwtVerify(secret string) gin.HandlerFunc {
 		// fmt.Println(claims[constants.IsEmployer])
 		// fmt.Println(claims[constants.UniqueID])
 		if !ok {
-			response := models.Response{Message: "Invalid Token Claims", Status: http.StatusUnauthorized, Data: ""}
+			response := models.Response{Message: "Invalid Token Claims", Data: ""}
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
 			return

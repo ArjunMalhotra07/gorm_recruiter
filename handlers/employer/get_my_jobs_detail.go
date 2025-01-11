@@ -17,7 +17,7 @@ func (h *EmployerHandler) GetMyJobsDetail(c *gin.Context) {
 	//! Fetch jobs posted by the user
 	jobs, err := h.repo.GetJobsPostedByUser(userID, true)
 	if err != nil {
-		response := models.Response{Message: "Error fetching job details!", Status: http.StatusInternalServerError}
+		response := models.Response{Message: "Error fetching job details!"}
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
@@ -29,7 +29,7 @@ func (h *EmployerHandler) GetMyJobsDetail(c *gin.Context) {
 	for _, job := range jobs {
 		applicants, err := h.repo.GetApplicantsForJob(job.JobID)
 		if err != nil {
-			response := models.Response{Message: "Error fetching applicants!", Status: http.StatusInternalServerError}
+			response := models.Response{Message: "Error fetching applicants!"}
 			c.JSON(http.StatusInternalServerError, response)
 			return
 		}
@@ -44,7 +44,6 @@ func (h *EmployerHandler) GetMyJobsDetail(c *gin.Context) {
 	//! Send response
 	response := models.Response{
 		Message: "My Jobs fetched successfully!",
-		Status:  http.StatusOK,
 		Data:    jobsWithApplicants,
 	}
 	c.JSON(http.StatusOK, response)

@@ -1,60 +1,58 @@
-package jobs
+package handlers
 
 import (
 	"net/http"
 	"os/exec"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/constants"
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-chi/chi"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func ApplyToJob(env *models.Env, w http.ResponseWriter, r *http.Request) {
-	jobID := chi.URLParam(r, constants.JobID)
-	userID := r.Context().Value("claims").(jwt.MapClaims)[constants.UniqueID].(string)
+func (h *JobsHandler) ApplyToJob(c *gin.Context) {
+	jobID := c.Param(constants.JobID)
+	claimsInterface, _ := c.Get(constants.Claims)
+	claims, _ := claimsInterface.(jwt.MapClaims)
+	userID, _ := claims[constants.UniqueID].(string)
 	//! Check if job exists
-	var job models.Job
-	if err := env.DB.Where("job_id = ?", jobID).First(&job).Error; err != nil {
+	err := h.repo.CheckIfJobExists(jobID)
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			response := models.Response{Message: "Job doesn't exist or has been deleted!", Status: http.StatusNotFound}
-			handlers.SendResponse(w, response, http.StatusNotFound)
+			response := models.Response{Message: "Job doesn't exist or has been deleted!"}
+			c.JSON(http.StatusNotFound, response)
 			return
 		}
-		response := models.Response{Message: "Error checking job existence", Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		response := models.Response{Message: "Error checking job existence"}
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	//! Check if user has already applied
-	var existingApplication models.JobApplication
-	if err := env.DB.Where("applicant_id = ? AND job_id = ?", userID, jobID).First(&existingApplication).Error; err == nil {
-		response := models.Response{Message: "You have already applied for this job!", Status: http.StatusConflict}
-		handlers.SendResponse(w, response, http.StatusConflict)
+	existingApplication, err := h.repo.CheckIfApplied(userID, jobID)
+	if err == nil {
+		response := models.Response{Message: "You have already applied for this job!", Data: existingApplication}
+		c.JSON(http.StatusConflict, response)
 		return
 	} else if err != gorm.ErrRecordNotFound {
-		response := models.Response{Message: "Error checking application status", Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		response := models.Response{Message: "Error checking application status"}
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	//! Generate Application ID
 	applicationID, err := exec.Command("uuidgen").Output()
 	if err != nil {
-		response := models.Response{Message: "Error generating Application ID", Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		response := models.Response{Message: "Error generating Application ID"}
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	var application models.JobApplication
-	application.ApplicationID = string(applicationID)
-	application.ApplicantID = userID
-	application.JobID = jobID
 	//! Add application to table
-	if err := env.Create(&application).Error; err != nil {
-		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+	err = h.repo.CreateApplication(string(applicationID), userID, jobID)
+	if err != nil {
+		response := models.Response{Message: err.Error()}
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	response := models.Response{Message: "Job Applied successfully!", Status: 200}
-	handlers.SendResponse(w, response, http.StatusOK)
+	response := models.Response{Message: "Job Applied successfully!"}
+	c.JSON(http.StatusOK, response)
 }

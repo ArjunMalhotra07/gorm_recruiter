@@ -1,4 +1,4 @@
-package jobs
+package handlers
 
 import (
 	"net/http"
@@ -17,17 +17,16 @@ func GetJobData(env *models.Env, w http.ResponseWriter, r *http.Request) {
 	var job models.Job
 	if err := env.DB.Preload("PostedBy").First(&job, "job_id = ?", jobID).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			response := models.Response{Message: "Job doesn't exist or is either deleted!", Status: http.StatusNotFound}
+			response := models.Response{Message: "Job doesn't exist or is either deleted!"}
 			handlers.SendResponse(w, response, http.StatusNotFound)
 			return
 		}
-		response := models.Response{Message: "Error fetching job details", Status: http.StatusInternalServerError}
+		response := models.Response{Message: "Error fetching job details"}
 		handlers.SendResponse(w, response, http.StatusInternalServerError)
 		return
 	}
 	response := models.Response{
 		Message: "Job fetched successfully!",
-		Status:  http.StatusOK,
 		Data:    job,
 	}
 	handlers.SendResponse(w, response, http.StatusOK)

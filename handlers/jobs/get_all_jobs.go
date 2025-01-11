@@ -1,30 +1,29 @@
-package jobs
+package handlers
 
 import (
 	"net/http"
 
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func GetAllJobs(env *models.Env, w http.ResponseWriter, r *http.Request) {
+func (h *JobsHandler) GetAllJobs(c *gin.Context) {
 	//! Fetch data from DB
-	var jobs []models.Job
-	if err := env.DB.Where("is_active = ?", true).Find(&jobs).Error; err != nil {
+	jobs, err := h.repo.GetAllJobs()
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			response := models.Response{Message: "No Active Jobs!", Status: http.StatusNotFound}
-			handlers.SendResponse(w, response, http.StatusNotFound)
+			response := models.Response{Message: "No Active Jobs!"}
+			c.JSON(http.StatusNotFound, response)
 			return
 		}
-		response := models.Response{Message: "Error fetching job details", Status: http.StatusInternalServerError}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		response := models.Response{Message: "Error fetching job details"}
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	response := models.Response{
 		Message: "Jobs fetched successfully!",
-		Status:  http.StatusOK,
 		Data:    jobs,
 	}
-	handlers.SendResponse(w, response, http.StatusOK)
+	c.JSON(http.StatusOK, response)
 }

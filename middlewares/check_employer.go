@@ -13,14 +13,14 @@ func CheckEmployer() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		claimsInterface, exists := c.Get(constants.Claims)
 		if !exists || claimsInterface == nil {
-			response := models.Response{Message: "Unauthorized request", Status: http.StatusUnauthorized}
+			response := models.Response{Message: "Unauthorized request"}
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
 			return
 		}
 		claims, ok := claimsInterface.(jwt.MapClaims)
 		if !ok {
-			response := models.Response{Message: "Invalid claims format", Status: http.StatusUnauthorized}
+			response := models.Response{Message: "Invalid claims format"}
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
 			return
@@ -29,7 +29,7 @@ func CheckEmployer() gin.HandlerFunc {
 		// fmt.Println(isEmployer)
 		// fmt.Println("Checking if the user is an employer")
 		if !ok || !isEmployer {
-			response := models.Response{Message: "Not an employer!", Status: http.StatusUnauthorized}
+			response := models.Response{Message: "Not an employer!"}
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
 			return

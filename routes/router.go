@@ -32,7 +32,7 @@ func AppRoutes(env *models.Env, driver *gorm.DB) *gin.Engine {
 }
 
 func DefaultRoute(c *gin.Context) {
-	message := models.Response{Message: "Hey!", Status: 200}
+	message := models.Response{Message: "Hey!"}
 	c.JSON(http.StatusOK, message)
 }
 

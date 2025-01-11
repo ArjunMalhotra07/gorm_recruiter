@@ -18,14 +18,14 @@ func (h *EmployerHandler) AddJob(c *gin.Context) {
 	//! Decode the incoming JSON body into a Job struct
 	var currentJob models.Job
 	if err := c.ShouldBindJSON(&currentJob); err != nil {
-		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
+		response := models.Response{Message: err.Error()}
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	//! Generating new id for job
 	newUUID, err := exec.Command("uuidgen").Output()
 	if err != nil {
-		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
+		response := models.Response{Message: err.Error()}
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
@@ -33,10 +33,10 @@ func (h *EmployerHandler) AddJob(c *gin.Context) {
 	currentJob.PostedByID = userID
 	//! Add job in table
 	if err := h.repo.AddJob(&currentJob); err != nil {
-		response := models.Response{Message: err.Error(), Status: http.StatusInternalServerError}
+		response := models.Response{Message: err.Error()}
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	response := models.Response{Message: "Job Posted successfully!", Status: 200}
+	response := models.Response{Message: "Job Posted successfully!"}
 	c.JSON(http.StatusOK, response)
 }
