@@ -4,30 +4,29 @@ import (
 	"net/http"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/constants"
-	"github.com/ArjunMalhotra07/gorm_recruiter/handlers"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
-	"github.com/go-chi/chi"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func GetJobData(env *models.Env, w http.ResponseWriter, r *http.Request) {
+func (h *JobsHandler) GetJobData(c *gin.Context) {
 	//! Get Job ID
-	jobID := chi.URLParam(r, constants.JobID)
+	jobID := c.Param(constants.JobID)
 	//! Fetch data from DB
-	var job models.Job
-	if err := env.DB.Preload("PostedBy").First(&job, "job_id = ?", jobID).Error; err != nil {
+	job, err := h.repo.GetJobData(jobID)
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			response := models.Response{Message: "Job doesn't exist or is either deleted!"}
-			handlers.SendResponse(w, response, http.StatusNotFound)
+			c.JSON(http.StatusNotFound, response)
 			return
 		}
 		response := models.Response{Message: "Error fetching job details"}
-		handlers.SendResponse(w, response, http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	response := models.Response{
 		Message: "Job fetched successfully!",
 		Data:    job,
 	}
-	handlers.SendResponse(w, response, http.StatusOK)
+	c.JSON(http.StatusOK, response)
 }

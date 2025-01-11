@@ -10,6 +10,7 @@ type JobsRepository interface {
 	CheckIfApplied(applicantID, jobID string) (*models.JobApplication, error)
 	CreateApplication(applicationID, applicantID, jobID string) error
 	GetAllJobs() (*[]models.Job, error)
+	GetJobData(jobID string) (*models.Job, error)
 }
 
 type JobRepo struct {
