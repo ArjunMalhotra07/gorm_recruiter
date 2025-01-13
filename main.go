@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/application"
+	"github.com/ArjunMalhotra07/gorm_recruiter/bootstrap"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -25,6 +28,13 @@ func main() {
 		return
 	}
 	var app *models.App = application.New(driver)
+	bootstrap.RegisterMetrics()
+	go func() {
+		// Serve Prometheus metrics at /metrics endpoint
+		http.Handle("/metrics", promhttp.Handler())
+		log.Println("Prometheus metrics available at /metrics")
+		log.Fatal(http.ListenAndServe(":9100", nil)) // Prometheus server runs on port 9100
+	}()
 	if err := application.StartServer(app); err != nil {
 		log.Fatal(err)
 	}
