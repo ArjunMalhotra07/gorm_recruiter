@@ -11,5 +11,5 @@ func MiscRoutes(router *gin.RouterGroup, driver *gorm.DB) {
 	miscRepo := repo.NewMiscRepo(driver)
 	miscHandler := handlers.NewMiscHandler(miscRepo)
 	router.GET("/getall", miscHandler.GetAllApplicants)
-	router.POST("/getresumes", miscHandler.GetAllResumes)
+	router.GET("/getresumes", miscHandler.GetAllResumes)
 }
