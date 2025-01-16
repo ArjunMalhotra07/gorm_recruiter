@@ -15,7 +15,7 @@ import (
 
 func main() {
 	fmt.Println("Started main function")
-	dsn := "root:Witcher_Arjun7@tcp(127.0.0.1:3306)/New_DB?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:example@tcp(127.0.0.1:3307)/crud_db?charset=utf8mb4&parseTime=True&loc=Local"
 	driver, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect to the database: %v", err)

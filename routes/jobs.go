@@ -10,9 +10,8 @@ import (
 func JobRoutes(router *gin.RouterGroup, driver *gorm.DB) {
 	jobRepo := repo.NewJobRepo(driver)
 	jobHandler := handlers.NewJobHandler(jobRepo)
-	router.POST("/apply/{job_id}", jobHandler.ApplyToJob)
-	router.POST("/", jobHandler.GetAllJobs)
-	router.POST("/jobdata/{job_id}", jobHandler.GetJobData)
+	router.POST("/apply/:job_id", jobHandler.ApplyToJob)
+	router.GET("/", jobHandler.GetAllJobs)
+	router.GET("/jobdata/:job_id", jobHandler.GetJobData)
 	router.POST("/uploadresume", jobHandler.UploadResume)
-
 }

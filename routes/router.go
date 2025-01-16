@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func AppRoutes(env *models.Env, driver *gorm.DB) *gin.Engine {
+func AppRoutes(driver *gorm.DB) *gin.Engine {
 	router := gin.Default()
 	// router.Use(middlewares.Logger)
 	router.GET("/", DefaultRoute)
