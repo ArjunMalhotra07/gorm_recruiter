@@ -24,9 +24,10 @@ func main() {
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, dbName)
+	// dbHost := os.Getenv("DB_HOST")
+	// dbPort := os.Getenv("DB_PORT")
+	dsn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3307)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbName)
+	fmt.Println(dsn)
 	driver, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		// Logger: logger.Default.LogMode(logger.Info),
 	})

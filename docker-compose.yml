@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   mysql:
     image: mysql:8.0
@@ -11,6 +12,38 @@ services:
       - mysql_data:/var/lib/mysql
     env_file:
       - .env
+    networks:
+      - app_network
+
+  email_service:
+    build:
+      context: ../email-service
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    networks:
+      - app_network
+
+  job_portal:
+    build:
+      context: ../gorm_recruiter
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - email_service
+    networks:
+      - app_network
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+
+networks:
+  app_network:
 
 volumes:
   mysql_data:
