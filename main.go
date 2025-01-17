@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/application"
 	"github.com/ArjunMalhotra07/gorm_recruiter/bootstrap"
@@ -24,24 +25,35 @@ func main() {
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
-	// dbHost := os.Getenv("DB_HOST")
-	// dbPort := os.Getenv("DB_PORT")
-	dsn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3307)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(mysql:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbName)
 	fmt.Println(dsn)
-	driver, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		// Logger: logger.Default.LogMode(logger.Info),
-	})
-	if err != nil {
-		log.Fatalf("failed to connect to the database: %v", err)
+
+	var db *gorm.DB
+	retryAttempts := 5
+	retryInterval := 5 * time.Second
+
+	for i := 0; i < retryAttempts; i++ {
+		driver, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		if err == nil {
+			db = driver
+			fmt.Println("Database connected successfully:", db)
+			break
+		}
+		log.Printf("Failed to connect to the database (attempt %d/%d): %v", i+1, retryAttempts, err)
+		time.Sleep(retryInterval)
+	}
+
+	if db == nil {
+		log.Fatalf("Failed to connect to the database after %d attempts", retryAttempts)
 		return
 	}
-	fmt.Println("Database connected successfully:", driver)
+
 	// Auto-migrate all models
-	if err := driver.AutoMigrate(&models.User{}, &models.Job{}, &models.Resume{}, &models.Education{}, &models.Experience{}, &models.JobApplication{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Job{}, &models.Resume{}, &models.Education{}, &models.Experience{}, &models.JobApplication{}); err != nil {
 		log.Fatalf("failed to auto-migrate database: %v", err)
 		return
 	}
-	var app *models.App = application.New(driver)
+	var app *models.App = application.New(db)
 	bootstrap.RegisterMetrics()
 	go func() {
 		// Serve Prometheus metrics at /metrics endpoint
