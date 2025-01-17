@@ -1,14 +1,13 @@
 package repo
 
 import (
-	"os/exec"
-
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
+	"github.com/google/uuid"
 )
 
-func (r *AuthRepo) CreateUserID() (string, error) {
-	userID, err := exec.Command("uuidgen").Output()
-	return string(userID), err
+func (r *AuthRepo) CreateUserID() string {
+	userID := uuid.New().String()
+	return userID
 }
 
 func (r *AuthRepo) CreateEncryptedPassword(userPassword, passwordHash string) (string, error) {

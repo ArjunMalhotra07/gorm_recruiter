@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"net/http"
-	"os/exec"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/constants"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func (h *EmployerHandler) AddJob(c *gin.Context) {
@@ -23,13 +23,8 @@ func (h *EmployerHandler) AddJob(c *gin.Context) {
 		return
 	}
 	//! Generating new id for job
-	newUUID, err := exec.Command("uuidgen").Output()
-	if err != nil {
-		response := models.Response{Message: err.Error()}
-		c.JSON(http.StatusInternalServerError, response)
-		return
-	}
-	currentJob.JobID = string(newUUID)
+	newUUID := uuid.New().String()
+	currentJob.JobID = newUUID
 	currentJob.PostedByID = userID
 	//! Add job in table
 	if err := h.repo.AddJob(&currentJob); err != nil {

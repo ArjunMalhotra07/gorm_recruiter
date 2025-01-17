@@ -37,14 +37,8 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 		return
 	}
 	//! Generate UUID
-	newUUID, err := h.repo.CreateUserID()
-	if err != nil {
-		response := models.Response{Message: err.Error()}
-		c.JSON(http.StatusInternalServerError, response)
-		bootstrap.UserSignups.WithLabelValues("failure").Inc()
-		return
-	}
-	user.UserID = string(newUUID)
+	newUUID := h.repo.CreateUserID()
+	user.UserID = newUUID
 	//! Generate encrypted password
 	encryptedPassword, err := h.repo.CreateEncryptedPassword(user.PasswordHash, seeders.PasswordHashingSecret)
 	if err != nil {
@@ -62,7 +56,7 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 		return
 	}
 	//! Genrate token
-	tokenString, tokenError := h.repo.CreateJwtToken(string(newUUID), user.IsEmployer)
+	tokenString, tokenError := h.repo.CreateJwtToken(newUUID, user.IsEmployer)
 	if tokenError != nil {
 		response := models.Response{Message: "Failed to create token"}
 		c.JSON(http.StatusInternalServerError, response)
