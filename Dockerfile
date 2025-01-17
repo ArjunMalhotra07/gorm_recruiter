@@ -1,18 +1,14 @@
-# Base image
-FROM golang:1.22
-
-# Set the working directory
+FROM golang:1.23-alpine AS build
 WORKDIR /app
-
-# Copy source code
-COPY . .
-
-# Download dependencies and build the application
+COPY go.mod go.sum ./
 RUN go mod download
-RUN go build -o job_portal main.go
-
-# Expose application ports
-EXPOSE 8080
-
-# Start the job portal service
+COPY . .
+COPY .env .env 
+RUN CGO_ENABLED=0 GOOS=linux go build -o job_portal main.go
+FROM alpine:3.18
+WORKDIR /app
+COPY --from=build /app/job_portal .
+COPY --from=build /app/.env .env
+RUN apk --no-cache add ca-certificates tzdata
+EXPOSE 8080 9100
 CMD ["./job_portal"]
