@@ -24,7 +24,7 @@ type AuthRepo struct {
 }
 
 func NewAuthRepo(db *gorm.DB) *AuthRepo {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial("email_service:50051", grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("Failed to connect to email service: %v", err)
 	}
