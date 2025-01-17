@@ -1,10 +1,8 @@
-version: "3.9"
-
 services:
   mysql:
     image: mysql:8.0
     ports:
-      - "3307:3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
@@ -14,10 +12,15 @@ services:
       - .env
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   email_service:
     build:
-      context: ../email-service
+      context: ../../email-service
       dockerfile: Dockerfile
     ports:
       - "50051:50051"
@@ -31,8 +34,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
-      - email_service
+      mysql:
+        condition: service_healthy
+      email_service:
+        condition: service_started
     networks:
       - app_network
     environment:
@@ -41,7 +46,8 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-
+      DB_CONNECTION: $(DB_CONNECTION)
+      DB_CONNECTION_STRING: root:example@tcp(mysql:3306)/crud_db?charset=utf8mb4&parseTime=True&loc=Local
 networks:
   app_network:
 
