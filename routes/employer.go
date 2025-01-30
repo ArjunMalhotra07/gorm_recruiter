@@ -14,20 +14,16 @@ import (
 func EmployerRoutes(router *gin.RouterGroup) {
 	router.Use(middlewares.JwtVerify(seeders.JwtSecret))
 	router.Use(middlewares.CheckEmployer())
-
 	router.GET("/getmyjobs", employerHandlerWrapper(func(employerHandler *handlers.EmployerHandler, c *gin.Context) {
 		employerHandler.GetMyJobsDetail(c)
 	}))
-
 	router.GET("/getapplicantdata", employerHandlerWrapper(func(employerHandler *handlers.EmployerHandler, c *gin.Context) {
 		employerHandler.GetApplicantData(c)
 	}))
-
 	router.POST("/postjob", employerHandlerWrapper(func(employerHandler *handlers.EmployerHandler, c *gin.Context) {
 		employerHandler.AddJob(c)
 	}))
 }
-
 func employerHandlerWrapper(handlerFunc func(*handlers.EmployerHandler, *gin.Context)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cfg, exists := c.Get("config")

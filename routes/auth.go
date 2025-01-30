@@ -13,12 +13,10 @@ func AuthRoutes(router *gin.RouterGroup) {
 	router.POST("/signup", authHandlerWrapper(func(authHandler *handlers.AuthHandler, c *gin.Context) {
 		authHandler.SignUp(c)
 	}))
-
 	router.POST("/login", authHandlerWrapper(func(authHandler *handlers.AuthHandler, c *gin.Context) {
 		authHandler.LogIn(c)
 	}))
 }
-
 func authHandlerWrapper(handlerFunc func(*handlers.AuthHandler, *gin.Context)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cfg, exists := c.Get("config")
@@ -27,7 +25,7 @@ func authHandlerWrapper(handlerFunc func(*handlers.AuthHandler, *gin.Context)) g
 			return
 		}
 		config := cfg.(*config.Config)
-		authRepo := repo.NewAuthRepo(config.MySql.Driver)
+		authRepo := repo.NewAuthRepo(config.MySql.Driver, config.Microservices.EmailService)
 		authHandler := handlers.NewAuthHandler(authRepo)
 		handlerFunc(authHandler, c)
 	}

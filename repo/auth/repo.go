@@ -1,11 +1,8 @@
 package repo
 
 import (
-	"log"
-
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	pb "github.com/ArjunMalhotra07/gorm_recruiter/proto"
-	"google.golang.org/grpc"
 	"gorm.io/gorm"
 )
 
@@ -23,11 +20,6 @@ type AuthRepo struct {
 	EmailClient pb.EmailServiceClient
 }
 
-func NewAuthRepo(db *gorm.DB) *AuthRepo {
-	conn, err := grpc.Dial("email_service:50051", grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		log.Fatalf("Failed to connect to email service: %v", err)
-	}
-	emailClient := pb.NewEmailServiceClient(conn)
+func NewAuthRepo(db *gorm.DB, emailClient pb.EmailServiceClient) *AuthRepo {
 	return &AuthRepo{Driver: db, EmailClient: emailClient}
 }

@@ -10,15 +10,10 @@ import (
 
 func AppRoutes(config *config.Config) *gin.Engine {
 	router := gin.Default()
-	router.Use(func(c *gin.Context) {
-		c.Set("config", config)
-		c.Next()
-	})
+	router.Use(ConfigMiddleware(config))
 	router.GET("/", DefaultRoute)
 	var authAPIs *gin.RouterGroup = router.Group("/")
-	{
-		AuthRoutes(authAPIs)
-	}
+	AuthRoutes(authAPIs)
 	var employerAPIs *gin.RouterGroup = router.Group("/employer")
 	{
 		EmployerRoutes(employerAPIs)
@@ -36,4 +31,11 @@ func AppRoutes(config *config.Config) *gin.Engine {
 func DefaultRoute(c *gin.Context) {
 	message := models.Response{Message: "Hey!"}
 	c.JSON(http.StatusOK, message)
+}
+
+func ConfigMiddleware(cfg *config.Config) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("config", cfg)
+		c.Next()
+	}
 }

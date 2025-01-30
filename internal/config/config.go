@@ -1,13 +1,20 @@
 package config
 
 import (
+	"log"
 	"os"
 
+	pb "github.com/ArjunMalhotra07/gorm_recruiter/proto"
+	"google.golang.org/grpc"
 	"gorm.io/gorm"
 )
 
 type Config struct {
-	MySql MySQL
+	MySql         MySQL
+	Microservices Microservices
+}
+type Microservices struct {
+	EmailService pb.EmailServiceClient
 }
 
 type MySQL struct {
@@ -46,5 +53,12 @@ func NewConfig(fileName string) *Config {
 		panic("Env vars dbPORT not set")
 	}
 	mySQL.MysqlPort = dbPORT
-	return &Config{MySql: mySQL}
+	microservices := &Microservices{}
+	conn, err := grpc.Dial("email_service:50051", grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("Failed to connect to email service: %v", err)
+	}
+	emailClient := pb.NewEmailServiceClient(conn)
+	microservices.EmailService = emailClient
+	return &Config{MySql: mySQL, Microservices: *microservices}
 }
