@@ -4,58 +4,34 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"time"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/application"
 	"github.com/ArjunMalhotra07/gorm_recruiter/bootstrap"
-	"github.com/ArjunMalhotra07/gorm_recruiter/models"
+	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/config"
+	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/db"
 	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 func main() {
 	fmt.Println("Started main function")
-	err := godotenv.Load()
-	if err != nil {
+	// Load environment variables
+	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Error loading .env file")
 	}
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
-	dbHOST := os.Getenv("DB_HOST")
-	dbPORT := os.Getenv("DB_PORT")
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHOST, dbPORT, dbName)
-	fmt.Println(dsn)
-
-	var db *gorm.DB
-	retryAttempts := 5
-	retryInterval := 5 * time.Second
-
-	for i := 0; i < retryAttempts; i++ {
-		driver, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-		if err == nil {
-			db = driver
-			fmt.Println("Database connected successfully:", db)
-			break
-		}
-		log.Printf("Failed to connect to the database (attempt %d/%d): %v", i+1, retryAttempts, err)
-		time.Sleep(retryInterval)
+	// Load configuration
+	cfg := config.NewConfig(".env")
+	// Initialize database
+	sqlDB, err := db.NewMySQLDb(cfg)
+	if err != nil {
+		log.Fatalf("Database connection failed: %v", err)
 	}
-
-	if db == nil {
-		log.Fatalf("Failed to connect to the database after %d attempts", retryAttempts)
-		return
+	// Run database migrations
+	if err := db.Migrate(sqlDB.DB); err != nil {
+		log.Fatalf("Database migration failed: %v", err)
 	}
-
-	// Auto-migrate all models
-	if err := db.AutoMigrate(&models.User{}, &models.Job{}, &models.Resume{}, &models.Education{}, &models.Experience{}, &models.JobApplication{}); err != nil {
-		log.Fatalf("failed to auto-migrate database: %v", err)
-		return
-	}
-	var app *models.App = application.New(db)
+	// Initialize application
+	app := application.New(sqlDB.DB)
 	bootstrap.RegisterMetrics()
 	go func() {
 		// Serve Prometheus metrics at /metrics endpoint
