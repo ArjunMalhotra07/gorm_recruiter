@@ -8,25 +8,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AppRoutes(cfg *config.Config) *gin.Engine {
+func AppRoutes(config *config.Config) *gin.Engine {
 	router := gin.Default()
-	// router.Use(middlewares.Logger)
+	router.Use(func(c *gin.Context) {
+		c.Set("config", config)
+		c.Next()
+	})
 	router.GET("/", DefaultRoute)
 	var authAPIs *gin.RouterGroup = router.Group("/")
 	{
-		AuthRoutes(authAPIs, cfg.MySql.Driver)
+		AuthRoutes(authAPIs)
 	}
 	var employerAPIs *gin.RouterGroup = router.Group("/employer")
 	{
-		EmployerRoutes(employerAPIs, cfg.MySql.Driver)
+		EmployerRoutes(employerAPIs)
 	}
 	var jobsAPIs *gin.RouterGroup = router.Group("/jobs")
 	{
-		JobRoutes(jobsAPIs, cfg.MySql.Driver)
+		JobRoutes(jobsAPIs)
 	}
 	var miscAPIs *gin.RouterGroup = router.Group("/misc")
 	{
-		MiscRoutes(miscAPIs, cfg.MySql.Driver)
+		MiscRoutes(miscAPIs)
 	}
 	return router
 }
