@@ -15,17 +15,11 @@ func AppRoutes(config *config.Config) *gin.Engine {
 	var authAPIs *gin.RouterGroup = router.Group("/")
 	AuthRoutes(authAPIs)
 	var employerAPIs *gin.RouterGroup = router.Group("/employer")
-	{
-		EmployerRoutes(employerAPIs)
-	}
+	EmployerRoutes(employerAPIs)
 	var jobsAPIs *gin.RouterGroup = router.Group("/jobs")
-	{
-		JobRoutes(jobsAPIs)
-	}
+	JobRoutes(jobsAPIs)
 	var miscAPIs *gin.RouterGroup = router.Group("/misc")
-	{
-		MiscRoutes(miscAPIs)
-	}
+	MiscRoutes(miscAPIs)
 	return router
 }
 func DefaultRoute(c *gin.Context) {
