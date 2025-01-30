@@ -3,12 +3,13 @@ package models
 import (
 	"net/http"
 
+	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/config"
 	"gorm.io/gorm"
 )
 
 type App struct {
 	Router http.Handler
-	Driver *gorm.DB
+	Config *config.Config
 }
 
 type Env struct {

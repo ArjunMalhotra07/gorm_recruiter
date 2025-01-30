@@ -1,6 +1,10 @@
 package config
 
-import "os"
+import (
+	"os"
+
+	"gorm.io/gorm"
+)
 
 type Config struct {
 	MySql MySQL
@@ -12,6 +16,7 @@ type MySQL struct {
 	MysqlUser     string
 	MysqlPassword string
 	MysqlDBName   string
+	Driver        *gorm.DB
 }
 
 func NewConfig(fileName string) *Config {

@@ -4,29 +4,29 @@ import (
 	"net/http"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
+	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/config"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-func AppRoutes(driver *gorm.DB) *gin.Engine {
+func AppRoutes(cfg *config.Config) *gin.Engine {
 	router := gin.Default()
 	// router.Use(middlewares.Logger)
 	router.GET("/", DefaultRoute)
 	var authAPIs *gin.RouterGroup = router.Group("/")
 	{
-		AuthRoutes(authAPIs, driver)
+		AuthRoutes(authAPIs, cfg.MySql.Driver)
 	}
 	var employerAPIs *gin.RouterGroup = router.Group("/employer")
 	{
-		EmployerRoutes(employerAPIs, driver)
+		EmployerRoutes(employerAPIs, cfg.MySql.Driver)
 	}
 	var jobsAPIs *gin.RouterGroup = router.Group("/jobs")
 	{
-		JobRoutes(jobsAPIs, driver)
+		JobRoutes(jobsAPIs, cfg.MySql.Driver)
 	}
 	var miscAPIs *gin.RouterGroup = router.Group("/misc")
 	{
-		MiscRoutes(miscAPIs, driver)
+		MiscRoutes(miscAPIs, cfg.MySql.Driver)
 	}
 	return router
 }

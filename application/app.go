@@ -10,11 +10,10 @@ import (
 	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/db"
 	"github.com/ArjunMalhotra07/gorm_recruiter/routes"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"gorm.io/gorm"
 )
 
-func NewApp(driver *gorm.DB) *models.App {
-	return &models.App{Router: routes.AppRoutes(driver), Driver: driver}
+func NewApp(config *config.Config) *models.App {
+	return &models.App{Router: routes.AppRoutes(config), Config: config}
 }
 
 func StartServer() error {
@@ -26,7 +25,8 @@ func StartServer() error {
 	if err := db.Migrate(sqlDB.DB); err != nil {
 		log.Fatalf("Database migration failed: %v", err)
 	}
-	app := NewApp(sqlDB.DB)
+	cfg.MySql.Driver = sqlDB.DB
+	app := NewApp(cfg)
 	bootstrap.RegisterMetrics()
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
