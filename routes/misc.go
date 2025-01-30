@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	handlers "github.com/ArjunMalhotra07/gorm_recruiter/handlers/misc"
-	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/config"
+	"github.com/ArjunMalhotra07/gorm_recruiter/internal/config"
 	repo "github.com/ArjunMalhotra07/gorm_recruiter/repo/misc"
 	"github.com/gin-gonic/gin"
 )

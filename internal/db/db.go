@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
-	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/config"
+	"github.com/ArjunMalhotra07/gorm_recruiter/internal/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/ArjunMalhotra07/gorm_recruiter/bootstrap"
+	"github.com/ArjunMalhotra07/gorm_recruiter/internal/config"
+	"github.com/ArjunMalhotra07/gorm_recruiter/internal/db"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
-	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/config"
-	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/db"
 	"github.com/ArjunMalhotra07/gorm_recruiter/routes"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )

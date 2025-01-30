@@ -5,7 +5,7 @@ import (
 
 	handlers "github.com/ArjunMalhotra07/gorm_recruiter/handlers/jobs"
 	"github.com/ArjunMalhotra07/gorm_recruiter/middlewares"
-	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/config"
+	"github.com/ArjunMalhotra07/gorm_recruiter/internal/config"
 	repo "github.com/ArjunMalhotra07/gorm_recruiter/repo/jobs"
 	"github.com/ArjunMalhotra07/gorm_recruiter/seeders"
 	"github.com/gin-gonic/gin"

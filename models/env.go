@@ -3,7 +3,7 @@ package models
 import (
 	"net/http"
 
-	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/config"
+	"github.com/ArjunMalhotra07/gorm_recruiter/internal/config"
 )
 
 type App struct {

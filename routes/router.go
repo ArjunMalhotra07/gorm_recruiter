@@ -3,8 +3,8 @@ package routes
 import (
 	"net/http"
 
+	"github.com/ArjunMalhotra07/gorm_recruiter/internal/config"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
-	"github.com/ArjunMalhotra07/gorm_recruiter/pkg/config"
 	"github.com/gin-gonic/gin"
 )
 
