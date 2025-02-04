@@ -20,10 +20,11 @@ services:
       retries: 3
 
   email_service:
-    image: email-service:1.0
-    build:
-      context: ../email-service
-      dockerfile: Dockerfile
+    image: arjunmalhotra07/email-service:latest
+    #! If we dont have a docker image registered, we can create our own by using project on a local 
+    # build:
+    #   context: ../email-service
+    #   dockerfile: Dockerfile
     ports:
       - "50051:50051"
     networks:
