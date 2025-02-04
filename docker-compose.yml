@@ -20,6 +20,7 @@ services:
       retries: 3
 
   email_service:
+    container_name: email_app
     image: arjunmalhotra07/email-service:latest
     #! If we dont have a docker image registered, we can create our own by using project on a local 
     # build:
@@ -31,10 +32,11 @@ services:
       - app_network
 
   job_portal:
-    image: job_portal:1.0
-    build:
-      context: ../gorm_recruiter
-      dockerfile: Dockerfile
+    container_name: job_portal_app
+    image: arjunmalhotra07/job-portal-service:latest
+    # build:
+    #   context: ../gorm_recruiter
+    #   dockerfile: Dockerfile
     ports:
       - "8080:8080"
       - "9100:9100"
