@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Started main function")
+	fmt.Println("Started main function here")
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Error loading .env file")
 	}
