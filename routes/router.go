@@ -1,17 +1,23 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 
+	_ "github.com/ArjunMalhotra07/gorm_recruiter/docs"
 	"github.com/ArjunMalhotra07/gorm_recruiter/internal/config"
 	"github.com/ArjunMalhotra07/gorm_recruiter/models"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func AppRoutes(config *config.Config) *gin.Engine {
 	router := gin.Default()
 	router.Use(ConfigMiddleware(config))
 	router.GET("/", DefaultRoute)
+	fmt.Println("Hey")
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	var authAPIs *gin.RouterGroup = router.Group("/")
 	AuthRoutes(authAPIs)
 	var employerAPIs *gin.RouterGroup = router.Group("/employer")

@@ -12,6 +12,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// SignUp godoc
+//	@Summary		Sign up a user
+//	@Description	Signs up a user, stores their details, and sends a welcome email
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		models.User		true	"User signup details"
+//	@Success		200		{object}	models.Response	"User successfully created"
+//	@Failure		400		{object}	models.Response	"Invalid request body or email format"
+//	@Failure		500		{object}	models.Response	"Internal server error"
+//	@Router			/signup [post]
 func (h *AuthHandler) SignUp(c *gin.Context) {
 	//! Decode incoming json body
 	var user models.User
@@ -55,7 +66,7 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 		bootstrap.UserSignups.WithLabelValues("failure").Inc()
 		return
 	}
-	//! Genrate token
+	//! Generate token
 	tokenString, tokenError := h.repo.CreateJwtToken(newUUID, user.IsEmployer)
 	if tokenError != nil {
 		response := models.Response{Message: "Failed to create token"}
@@ -66,6 +77,7 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 	bootstrap.UserSignups.WithLabelValues("success").Inc()
 	response := models.Response{Message: "Created new user", Jwt: &tokenString}
 	c.JSON(http.StatusOK, response)
+	//! Send welcome email
 	body := fmt.Sprintf("Hey %s, You have successfully signed up! Your profile headline `%s` is super catchy. We hope to provide you better services at %s", user.Name, user.ProfileHeadline, user.Address)
 	emailErr := h.repo.SendWelcomeEmail(user.Email, "Welcome to Our Platform!", body)
 	if emailErr != nil {
