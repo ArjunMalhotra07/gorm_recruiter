@@ -20,17 +20,17 @@ services:
       timeout: 5s
       retries: 3
 
-  # email-service:
-  #   container_name: email-service
-  #   image: arjunmalhotra07/email-service:latest
-  #   #! If we dont have a docker image registered, we can create our own by using project on a local 
-  #   # build:
-  #   #   context: ../email-service
-  #   #   dockerfile: Dockerfile
-  #   ports:
-  #     - "50051:50051"
-  #   networks:
-  #     - app_network
+  email-service:
+    container_name: email-service
+    image: arjunmalhotra07/email-service:latest
+    #! If we dont have a docker image registered, we can create our own by using project on a local 
+    # build:
+    #   context: ../email-service
+    #   dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    networks:
+      - app_network
 
   job-service:
     container_name: job-service
@@ -43,7 +43,7 @@ services:
       - "9100:9100"
     depends_on:
       - mysql-service
-      # - email-service
+      - email-service
     networks:
       - app_network
     environment:
