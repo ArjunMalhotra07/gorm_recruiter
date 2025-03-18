@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -28,6 +29,7 @@ type MySQL struct {
 
 func NewConfig(fileName string) *Config {
 	mySQL := MySQL{}
+	//! MySQL
 	dbUser := os.Getenv("DB_USER")
 	if dbUser == "" {
 		panic("Env vars DBuser not set")
@@ -53,11 +55,23 @@ func NewConfig(fileName string) *Config {
 		panic("Env vars dbPORT not set")
 	}
 	mySQL.MysqlPort = dbPORT
+
 	microservices := &Microservices{}
-	conn, err := grpc.Dial("email_service:50051", grpc.WithInsecure(), grpc.WithBlock())
+	//! Email
+	emailDomain := os.Getenv("EMAIL_HOST")
+	if emailDomain == "" {
+		panic("Env vars EMAIL_HOST not set")
+	}
+	emailPort := os.Getenv("EMAIL_PORT")
+	if emailPort == "" {
+		panic("Env vars EMAIL_PORT not set")
+	}
+	emailConnectionString := fmt.Sprintf("%s:%s", emailDomain, emailPort)
+	conn, err := grpc.Dial(emailConnectionString, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("Failed to connect to email service: %v", err)
 	}
+	fmt.Println("Connected to email service at ", emailConnectionString)
 	emailClient := pb.NewEmailServiceClient(conn)
 	microservices.EmailService = emailClient
 	return &Config{MySql: mySQL, Microservices: *microservices}
